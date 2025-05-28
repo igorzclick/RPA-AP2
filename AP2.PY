@@ -1,5 +1,6 @@
 import requests
 import sqlite3
+import pandas as pd 
 from bs4 import BeautifulSoup
 from os import sys
 sys.stdout.reconfigure(encoding='utf-8')
@@ -100,6 +101,16 @@ def coletar_dados_paises():
 
     conn.commit()
     conn.close()
+    
+def exportar_paises_para_excel():
+    try:
+        conn = sqlite3.connect('paises.db')
+        df = pd.read_sql_query("SELECT * FROM paises", conn)
+        df.to_excel('paises_exportados.xslx', index=False)
+        conn.close()
+        print("✅ Exportação para Excel concluída: 'paises_exportados.csv'")
+    except Exception as e:
+        print(f"❌ Erro ao exportar para Excel: {e}")    
 
 
 def coletar_dados_livros():
@@ -140,6 +151,18 @@ def coletar_dados_livros():
 
     except Exception as e:
         print(f"❌ Erro ao coletar dados dos livros: {e}")
+        
+        
+def exportar_livros_para_excel():
+    try:
+        conn = sqlite3.connect('livraria.db')
+        df = pd.read_sql_query("SELECT * FROM livraria", conn)
+        df.to_excel('livros_exportados.xlsx', index=False)
+        conn.close()
+        print("✅ Exportação para Excel concluída: 'livros_exportados.csv'")
+    except Exception as e:
+        print(f"❌ Erro ao exportar para Excel: {e}")     
+               
 
 
 def menu():
@@ -154,7 +177,9 @@ def menu():
         print("3. Apagar valores Banco de dados de Paises")
         print("4. Apagar valores Banco de dados de Livros")
         print("5. DELETA TUDO ")
-        print("4. Sair")
+        print("6. Exportar Paises para Excel")
+        print("7. Exportar Livros para Excel")
+        print("8. Sair")
         escolha = input("Escolha uma opção: ")
 
         if escolha == '1':
@@ -182,14 +207,20 @@ def menu():
                 conn.commit()  
                 print(' Todos os bancos de dados foram deletados.')
             except Exception as e:
-                print(f"❌ Erro ao deletar os dados: {e}")        
+                print(f"❌ Erro ao deletar os dados: {e}")
+        elif escolha == '6':
+            print('Exportando dados para Excel...')
+            exportar_paises_para_excel()
+            
+        elif escolha == '7':
+            print('Exportando dados para Excel...')
+            exportar_livros_para_excel()                
                 
-        elif escolha==5:
+        elif escolha==8:
             print('Saindo....')    
             break
         else:
             print("Opção inválida. Tente novamente.")
 
 
-if _name_ == '_main_':
-    menu()
+menu()
